@@ -21,6 +21,8 @@ import typing
 from typing import Optional
 import warnings
 
+from datetime import timedelta
+
 try:
     import tqdm  # type: ignore
     import tqdm.notebook as notebook  # type: ignore
@@ -95,7 +97,7 @@ def wait_for_query(
     """
     default_total = 1
     current_stage = None
-    start_time = time.perf_counter()
+    start_time = query_job.start_time
 
     progress_bar = get_progress_bar(
         progress_bar_type, "Query is running", default_total, "query"
@@ -110,7 +112,7 @@ def wait_for_query(
             current_stage = query_job.query_plan[i]
             progress_bar.total = len(query_job.query_plan)
             progress_bar.set_description(
-                f"Query executing stage {current_stage.name} and status {current_stage.status} : {time.perf_counter() - start_time:.2f}s"
+                f"Query executing stage {current_stage.name} and status {current_stage.status} : {time.time() - start_time:.2f}s"
             )
         try:
             query_result = query_job.result(
@@ -118,7 +120,7 @@ def wait_for_query(
             )
             progress_bar.update(default_total)
             progress_bar.set_description(
-                f"Job ID {query_job.job_id} successfully executed",
+                f"Job ID {query_job.job_id} successfully executed in {time.time() - start_time:.2f}s",
             )
             break
         except concurrent.futures.TimeoutError:

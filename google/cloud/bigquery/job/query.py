@@ -16,6 +16,7 @@
 
 import concurrent.futures
 import copy
+import time
 import re
 import typing
 from typing import Any, Dict, Iterable, List, Optional, Union
@@ -765,6 +766,7 @@ class QueryJob(_AsyncJob):
         self._query_results = None
         self._done_timeout = None
         self._transport_timeout = None
+        self._start_time = time.time()
 
     @property
     def allow_large_results(self):
@@ -940,6 +942,11 @@ class QueryJob(_AsyncJob):
         :attr:`google.cloud.bigquery.job.QueryJobConfig.schema_update_options`.
         """
         return self._configuration.schema_update_options
+
+    @property
+    def start_time(self):
+        """Time that the QueryJob was created."""
+        return self._start_time
 
     def to_api_repr(self):
         """Generate a resource for :meth:`_begin`."""
